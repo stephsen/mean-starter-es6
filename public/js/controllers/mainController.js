@@ -1,31 +1,17 @@
-function mainController(todoService) {
+function mainController($http, $location, todoService, $routeParams) {
 
-    this.todoService = todoService;
-
-    this.load = () => {
-        this.todoService.getAll().then((res) => {
-            this.todos = res.data;
-        });
+    this.getAll = () => {
+        todoService.getAll()
+            .then((result) => {
+                this.items = result.data;
+            });
     };
 
-    this.create = () => {
-        this.todoService.create(this.todo).then(() => {
-            this.todo = '';
-            this.load();
-        });
+    this.delete = (documentId) => {
+        todoService.delete(documentId)
+            .then((result) => {
+                delete this.items[documentId];
+                this.getAll();
+            });
     };
-
-    this.update = (todo) => {
-        this.todoService.update(todo._id, todo.description).then(() => {
-            this.load();
-        });
-    };
-
-    this.delete = (todo) => {
-        this.todoService.delete(todo._id).then(() => {
-            this.load();
-        });
-    };
-
-    this.load();
 }

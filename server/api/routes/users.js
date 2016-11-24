@@ -18,7 +18,7 @@ module.exports = (app) => {
 
     router.get('/:id', Auth.isAdministrator, user.findById);
 
-    router.post('/', user.create);
+    router.post('/', user.save);
 
     router.put('/:id', Auth.isAdministrator, user.update);
 

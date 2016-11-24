@@ -100,12 +100,12 @@ export default class User {
         });
     }
 
-    create(req, res) {
+    save(req, res) {
         if (req.body.password) {
             var salt = bcrypt.genSaltSync(10);
             req.body.password = bcrypt.hashSync(req.body.password, salt);
         }
-        model.create(req.body,
+        model.save(req.body,
             (err, user) => {
                 if (err || !user) {
                     if (err.code === 11000 || err.code === 11001) {

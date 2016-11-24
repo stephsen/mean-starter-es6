@@ -1,0 +1,22 @@
+
+
+<button class="btn btn-primary"><a href="/#/item">New Item</a></button>
+<br />
+<table class="table table-striped" ng-init="vm.getAll()">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="item in vm.items">
+            <td>{{item.firstname}}</td>
+            <td>{{item.lastname}}</td>
+            <td>{{item.email}}</td>
+            <td><a href="/#/item/{{item.id}}">edit</a>  |  <a href="" ng-click="vm.delete(item.id)">delete</a></td>
+        </tr>
+    </tbody>
+</table>

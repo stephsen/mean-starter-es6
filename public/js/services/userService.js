@@ -6,7 +6,7 @@ function userService($http) {
         return this.$http.post('/api/login', data)
     }
 
-    this.create = (user) => {
+    this.save = (user) => {
         return this.$http.post('/api/users', user)
     }
 

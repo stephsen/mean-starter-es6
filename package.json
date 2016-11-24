@@ -16,7 +16,8 @@
     "express": "",
     "jsonwebtoken": "",
     "method-override": "",
-    "mongoose": "",
+    "couchbase": "",
+    "uuid": "",
     "morgan": ""
   },
   "devDependencies": {

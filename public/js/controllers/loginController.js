@@ -27,8 +27,8 @@ function loginController(userService, sessionFactory, $timeout, $location, $root
         });
     };
 
-    this.createAccount = () => {
-        this.userService.create({
+    this.saveAccount = () => {
+        this.userService.save({
             email: this.email,
             password: this.password
         }).then((res) => {
@@ -38,7 +38,7 @@ function loginController(userService, sessionFactory, $timeout, $location, $root
             this.$rootScope.$emit('loginStatusChanged', true);
             this.loginMessage = {};
             this.loginMessage.type = "success";
-            this.loginMessage.title = "Account created !";
+            this.loginMessage.title = "Account saved !";
             this.loginMessage.message = "Redirecting...";
             this.$timeout(() => {
                 this.loginMessage = null;

@@ -1,67 +1,67 @@
-import mongoose from 'mongoose';
+var uuid = require("uuid");
+var db = require("../../../index").bucket;
+var config = require("../../config");
+var N1qlQuery = require('couchbase').N1qlQuery;
 
-const todoSchema = new mongoose.Schema({
-    description: String
-});
 
-let model = mongoose.model('Todo', todoSchema);
+// let model = mongoose.model('Todo', todoSchema);
+function Todo() {}
 
-export default class Todo {
-
-    findAll(req, res) {
-        model.find({}, (err, todos) => {
-            if (err) {
-                res.sendStatus(403);
-            } else {
-                res.json(todos);
-            }
-        });
-    }
-
-    findById(req, res) {
-        model.findById(req.params.id, (err, todo) => {
-            if (err || !todo) {
-                res.sendStatus(403);
-            } else {
-                res.json(todo);
-            }
-        });
-    }
-
-    create(req, res) {
-        model.create({
-                description: req.body.description
-            },
-            (err, todo) => {
-                if (err) {
-                    res.status(500).send(err.message);
-                } else {
-                    res.json(todo);
-                }
+Todo.save = function(data, callback) {
+  var todoSchema = {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email
+  };
+    var documentId = data.document_id ? data.document_id : uuid.v4();
+    db.upsert(documentId, todoSchema, function(error, result) {
+        if (error) {
+            callback(error, null);
+        } else {
+            callback(null, {
+                message: "success",
+                data: result
             });
-    }
+        }
+    });
+};
 
-    update(req, res) {
-        model.update({
-            _id: req.params.id
-        }, {
-            description: req.body.description
-        }, (err, todo) => {
-            if (err || !todo) {
-                res.status(500).send(err.message);
-            } else {
-                res.json(todo);
-            }
+Todo.getByDocumentId = function(documentId, callback) {
+    var statement = "SELECT firstname, lastname, email " +
+        "FROM `" + config.couchbase.bucket + "` AS users " +
+        "WHERE META(users).id = $1";
+    var query = N1qlQuery.fromString(statement);
+    db.query(query, [documentId], function(error, result) {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, result);
+        console.log(result);
+    });
+};
+
+Todo.delete = function(documentId, callback) {
+    db.remove(documentId, function(error, result) {
+        if (error) {
+            callback(error, null);
+            return;
+        }
+        callback(null, {
+            message: "success",
+            data: result
         });
-    }
+    });
+};
 
-    delete(req, res) {
-        model.findByIdAndRemove(req.params.id, (err) => {
-            if (err) {
-                res.status(500).send(err.message);
-            } else {
-                res.sendStatus(200);
-            }
-        })
-    }
-}
+Todo.getAll = function(callback) {
+    var statement = "SELECT META(users).id, firstname, lastname, email " +
+        "FROM `" + config.couchbase.bucket + "` AS users";
+    var query = N1qlQuery.fromString(statement).consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+    db.query(query, function(error, result) {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, result);
+    });
+};
+module.exports = Todo;
